@@ -1,1 +1,3 @@
-# Actividad-en-clase-JS-Asincronico
+# Implementación de Eventos JavaScript y Solicitudes Asíncronas
+
+Hans Eleizer Rivas Rugel
