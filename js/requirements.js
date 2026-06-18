@@ -1,4 +1,4 @@
-const getSalesCoffee = async () => {
+export const getSalesCoffee = async () => {
     // Reemplaza esta URL con el link exacto provisto en tu asignación si varía
     const url = 'https://api.sampleapis.com/coffee/hot'; 
     

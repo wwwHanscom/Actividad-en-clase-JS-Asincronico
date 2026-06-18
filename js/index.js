@@ -43,7 +43,26 @@ const processSalesCoffee = async () => {
         fixedHeight: true,
         perPage: 5
     });
+
+    salesData.forEach(item => {
+    tableHTML += "<tr class='border-b'>";
+    headers.forEach(header => {
+        let value = '';
+        
+        if (header === 'image') {
+            // Renderiza la imagen en lugar de la URL en texto plano
+            value = `<img src="${item[header]}" alt="${item['title']}" class="w-16 h-16 object-cover rounded">`;
+        } else {
+            value = Array.isArray(item[header]) ? item[header].join(", ") : item[header];
+        }
+        
+        tableHTML += `<td class="px-4 py-2 align-middle">${value || ''}</td>`;
+    });
+    tableHTML += "</tr>";
+});
 };
+
+
 
 // Ejecutar la función luego de cargarse por completo el DOM de la página
 document.addEventListener("DOMContentLoaded", processSalesCoffee);
