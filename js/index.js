@@ -1,68 +1,49 @@
 import { getSalesCoffee } from './requirements.js';
 
 const processSalesCoffee = async () => {
-    // 1. Obtener los datos asíncronos
     const salesData = await getSalesCoffee();
+    const tableElement = document.querySelector("#salesTable");
     
-    // 2. Mapear o estructurar los datos para la tabla si es necesario
-    // Suponiendo que la API de muestra devuelve objetos con { title, description, ingredients }
-    const tableBody = document.querySelector("#salesTable");
-    
-    if (salesData.length === 0) {
-        tableBody.innerHTML = "<thead><tr><th>No se encontraron datos</th></tr></thead>";
+    if (!salesData || salesData.length === 0) {
+        tableElement.innerHTML = "<thead><tr><th>No se encontraron datos de ventas</th></tr></thead>";
         return;
     }
 
-    // Crear encabezados dinámicos basados en las llaves del primer objeto
     const headers = Object.keys(salesData[0]);
-    let headerHTML = "<thead><tr>";
+    
+    let tableHTML = "<thead><tr>";
     headers.forEach(header => {
-        headerHTML += `<th class="px-4 py-2 text-left">${header.toUpperCase()}</th>`;
+        tableHTML += `<th class="px-4 py-2 text-left">${header.toUpperCase()}</th>`;
     });
-    headerHTML += "</tr></thead>";
+    tableHTML += "</tr></thead><tbody>";
 
-    // Crear filas de datos
-    let rowsHTML = "<tbody>";
     salesData.forEach(item => {
-        rowsHTML += "<tr class='border-b'>";
+        tableHTML += "<tr class='border-b'>";
         headers.forEach(header => {
-            // Manejar si el valor es un arreglo (como los ingredientes)
-            const value = Array.isArray(item[header]) ? item[header].join(", ") : item[header];
-            rowsHTML += `<td class="px-4 py-2">${value}</td>`;
+            let value = '';
+            
+            // CORRECCIÓN: Si la columna es la de la imagen, creamos la etiqueta <img>
+            if (header.toLowerCase() === 'image') {
+                value = `<img src="${item[header]}" alt="${item['title'] || 'Coffee'}" class="w-16 h-16 object-cover rounded-md shadow-sm">`;
+            } else {
+                // Si es un arreglo (como los ingredientes), los une con comas, si no, usa el valor normal
+                value = Array.isArray(item[header]) ? item[header].join(", ") : item[header];
+            }
+            
+            tableHTML += `<td class="px-4 py-2 align-middle">${value || ''}</td>`;
         });
-        rowsHTML += "</tr>";
+        tableHTML += "</tr>";
     });
-    rowsHTML += "</tbody>";
+    tableHTML += "</tbody>";
 
-    // Insertar en el HTML
-    tableBody.innerHTML = headerHTML + rowsHTML;
+    tableElement.innerHTML = tableHTML;
 
-    // 3. Inicializar el componente DataTable sobre la estructura generada
-    new simpleDatatables.DataTable("#salesTable", {
+    // Inicializar Simple-DataTables
+    new window.simpleDatatables.DataTable("#salesTable", {
         searchable: true,
         fixedHeight: true,
         perPage: 5
     });
-
-    salesData.forEach(item => {
-    tableHTML += "<tr class='border-b'>";
-    headers.forEach(header => {
-        let value = '';
-        
-        if (header === 'image') {
-            // Renderiza la imagen en lugar de la URL en texto plano
-            value = `<img src="${item[header]}" alt="${item['title']}" class="w-16 h-16 object-cover rounded">`;
-        } else {
-            value = Array.isArray(item[header]) ? item[header].join(", ") : item[header];
-        }
-        
-        tableHTML += `<td class="px-4 py-2 align-middle">${value || ''}</td>`;
-    });
-    tableHTML += "</tr>";
-});
 };
 
-
-
-// Ejecutar la función luego de cargarse por completo el DOM de la página
-document.addEventListener("DOMContentLoaded", processSalesCoffee);
+processSalesCoffee();
